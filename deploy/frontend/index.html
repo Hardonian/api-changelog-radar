@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Changelog Radar</title>
+  <style>
+    :root{--bg:#08101d;--card:#121c33;--text:#eef2ff;--dim:#9aa7cf;--accent:#6d5efc;--border:#253356;--green:#23c483}
+    *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:linear-gradient(180deg,#08101d,#111a31);color:var(--text)}
+    .wrap{max-width:1160px;margin:0 auto;padding:34px 20px 90px}.row{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}.card{background:rgba(18,28,51,.94);border:1px solid var(--border);border-radius:18px;padding:22px}pre{background:#09101f;border:1px solid var(--border);padding:16px;border-radius:14px;white-space:pre-wrap;color:#b8c2e7}
+    input,button,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e1630;color:var(--text);margin-top:8px}button{background:var(--accent);border:none;color:#fff;font-weight:800}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>API Changelog Radar</h1>
+    <p class="muted">Monitor vendor changelogs and get alerted before integrations break.</p>
+    <div class="row">
+      <div class="card">
+        <h2>Health</h2>
+        <pre id="health">Loading...</pre>
+      </div>
+      <div class="card">
+        <h2>Create Source</h2>
+        <select id="kind"><option value="changelog">Docs changelog</option><option value="spec">OpenAPI/SDK spec</option><option value="webhook">Webhook spec</option></select>
+        <input id="name" placeholder="Stripe API changelog" />
+        <input id="url" placeholder="https://stripe.com/docs/changelog" />
+        <button onclick="createSource()">Create source</button>
+        <pre id="create-result"></pre>
+      </div>
+    </div>
+  </div>
+  <script>
+    const API_BASE = 'https://api-changelog-radar.scottrmhardie.workers.dev/api/v1';
+    async function loadHealth() {
+      const res = await fetch(`${API_BASE}/health`);
+      const data = await res.json();
+      document.getElementById('health').textContent = JSON.stringify(data, null, 2);
+    }
+    async function createSource() {
+      const payload = { kind: document.getElementById('kind').value, name: document.getElementById('name').value, url: document.getElementById('url').value };
+      const res = await fetch(`${API_BASE}/sources`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const data = await res.json();
+      document.getElementById('create-result').textContent = JSON.stringify(data, null, 2);
+      loadHealth();
+    }
+    loadHealth();
+  </script>
+</body>
+</html>

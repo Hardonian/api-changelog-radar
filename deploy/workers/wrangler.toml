@@ -1,0 +1,14 @@
+name = "api-changelog-radar"
+main = "src/worker.js"
+compatibility_date = "2026-06-28"
+
+pages_build_output_dir = "../frontend"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "api_changelog_radar"
+database_id = "REPLACE_AFTER_CREATE"
+
+[vars]
+APP_NAME = "API Changelog Radar"
+APP_TAGLINE = "Monitor vendor changelogs, diff changes, alert teams before integrations break."

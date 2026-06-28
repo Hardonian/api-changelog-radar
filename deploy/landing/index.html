@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Changelog Radar — Detect breaking changes before your app breaks</title>
+  <style>
+    :root{--bg:#08101d;--card:#121c33;--text:#eef2ff;--dim:#9aa7cf;--accent:#6d5efc;--border:#253356;--green:#23c483}
+    *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:linear-gradient(180deg,#08101d,#111a31);color:var(--text)}
+    .wrap{max-width:1140px;margin:0 auto;padding:32px 20px 80px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .card{background:rgba(18,28,51,.94);border:1px solid var(--border);border-radius:18px;padding:20px}.buttons{display:flex;gap:14px;flex-wrap:wrap}
+    .btn{display:inline-block;text-decoration:none;padding:14px 18px;border-radius:12px;font-weight:800;border:none}.btn.primary{background:var(--accent);color:#fff}.btn.secondary{border:1px solid var(--border);color:var(--text)}
+    pre{background:#09101f;border:1px solid var(--border);padding:16px;border-radius:14px;white-space:pre-wrap;color:#b8c2e7}
+    input,select{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:#0e1630;color:var(--text);margin-top:8px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>API Changelog Radar</h1>
+    <p class="muted">Detect breaking changes before your app breaks.</p>
+    <div class="buttons">
+      <a class="btn primary" href="https://api-changelog-radar-frontend.pages.dev">Open Live Dashboard</a>
+      <a class="btn secondary" href="https://hardonian.github.io/api-changelog-radar">GitHub Repo</a>
+    </div>
+    <div class="card">
+      <h2>Create Your First Watch</h2>
+      <div class="row">
+        <label>Name<input id="lead-name" placeholder="Stripe API changelog" /></label>
+        <label>Email<input id="lead-email" placeholder="you@example.com" /></label>
+      </div>
+      <label>Source URL<input id="source-url" placeholder="https://stripe.com/docs/changelog" /></label>
+      <button class="btn primary" style="margin-top:10px" onclick="submit()">Get Started</button>
+      <pre id="result"></pre>
+    </div>
+  </div>
+  <script>
+    const API_BASE = 'https://api-changelog-radar.scottrmhardie.workers.dev/api/v1';
+    async function submit() {
+      const payload = { name: document.getElementById('lead-name').value, email: document.getElementById('lead-email').value, source_url: document.getElementById('source-url').value };
+      const res = await fetch(`${API_BASE}/leads`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const data = await res.json();
+      document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
