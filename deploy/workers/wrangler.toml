@@ -7,7 +7,7 @@ pages_build_output_dir = "../frontend"
 [[d1_databases]]
 binding = "DB"
 database_name = "api_changelog_radar"
-database_id = "REPLACE_AFTER_CREATE"
+database_id = "cd6cde11-6427-45dd-916e-6f14fdab2633"
 
 [vars]
 APP_NAME = "API Changelog Radar"
