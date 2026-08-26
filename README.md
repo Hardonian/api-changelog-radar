@@ -12,7 +12,7 @@ API Changelog Radar automatically polls vendor changelog pages, API specs, and d
 
 ## Architecture
 
-```
+```text
 ┌──────────────┐     ┌───────────────────┐     ┌──────────────┐
 │   Landing    │     │    Dashboard      │     │   GitHub     │
 │  (CF Pages)  │     │   (CF Pages)      │     │   Actions    │
@@ -40,7 +40,7 @@ API Changelog Radar automatically polls vendor changelog pages, API specs, and d
 ## Tech Stack
 
 | Layer | Technology |
-|---|---|
+| --- | --- |
 | **Runtime** | Cloudflare Workers (JavaScript, zero dependencies) |
 | **Database** | Cloudflare D1 (SQLite-compatible, edge-replicated) |
 | **Auth** | JWT (HMAC-SHA256) + API keys, all via Web Crypto API |
@@ -111,7 +111,7 @@ See [API.md](API.md) for complete API documentation.
 ### Key Endpoints
 
 | Method | Path | Auth | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `POST` | `/api/v1/auth/register` | No | Create account |
 | `POST` | `/api/v1/auth/login` | No | Sign in, get JWT |
 | `GET` | `/api/v1/auth/me` | Yes | Current user + usage |
@@ -126,7 +126,7 @@ See [API.md](API.md) for complete API documentation.
 
 ## Project Structure
 
-```
+```text
 deploy/
 ├── workers/
 │   ├── src/

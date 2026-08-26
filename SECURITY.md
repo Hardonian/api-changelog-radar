@@ -3,7 +3,7 @@
 ## Supported Versions
 
 | Version | Supported |
-|---|---|
+| --- | --- |
 | 1.x (current) | ✅ Active support |
 
 ## Reporting a Vulnerability
@@ -31,6 +31,7 @@ Please report vulnerabilities privately using one of these methods:
 ## Security Measures in Place
 
 ### Authentication & Authorization
+
 - PBKDF2 password hashing (100,000 iterations, SHA-256, random 16-byte salt)
 - JWT tokens (HMAC-SHA256) with configurable expiry
 - API keys stored as SHA-256 hashes (never plaintext, shown once on creation)
@@ -38,17 +39,20 @@ Please report vulnerabilities privately using one of these methods:
 - Constant-time comparison for password and token verification
 
 ### Data Protection
+
 - All database queries use parameterized statements (zero SQL injection surface)
 - Input validation on all endpoints (email, URL, string length, enums)
 - Request body size limits (1MB max)
 - Content-Type enforcement (application/json required)
 
 ### Transport Security
+
 - HSTS with 2-year max-age, includeSubDomains, preload
 - CORS restricted to configured origins (not wildcard in production)
 - All Cloudflare Workers traffic is HTTPS by default
 
 ### HTTP Security Headers
+
 - `Strict-Transport-Security`: HSTS enforcement
 - `X-Content-Type-Options: nosniff`: Prevent MIME sniffing
 - `X-Frame-Options: DENY`: Prevent clickjacking
@@ -57,23 +61,27 @@ Please report vulnerabilities privately using one of these methods:
 - `X-Request-Id`: Request tracing
 
 ### Rate Limiting
+
 - Per-IP rate limiting for unauthenticated requests (20 req/min)
 - Per-user rate limiting based on plan tier
 - Stricter limits on lead capture (5 req/min) and auth endpoints
 - `429 Too Many Requests` with `Retry-After` header
 
 ### Webhook Security
+
 - Outbound webhook payloads signed with HMAC-SHA256
 - Signature sent in `X-ACR-Signature` header
 - Event type in `X-ACR-Event` header
 
 ### Audit & Monitoring
+
 - All mutations logged in audit_log table
 - IP address and user agent captured
 - Alert delivery history tracked
 - Failed login attempts tracked
 
 ### CI/CD Security
+
 - Gitleaks secret scanning on every push and PR
 - npm audit for dependency vulnerabilities
 - CodeQL static analysis for JavaScript

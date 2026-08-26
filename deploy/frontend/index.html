@@ -39,6 +39,7 @@
       display: flex; align-items: center; justify-content: space-between;
       padding: 16px 28px;
       border-bottom: 1px solid var(--border);
+      -webkit-backdrop-filter: blur(12px);
       backdrop-filter: blur(12px);
       background: rgba(6,9,15,0.7);
       position: sticky; top: 0; z-index: 100;
@@ -62,6 +63,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 22px;
+      -webkit-backdrop-filter: blur(8px);
       backdrop-filter: blur(8px);
       transition: border-color 0.2s, box-shadow 0.2s;
     }
@@ -139,6 +141,7 @@
     .auth-container p { color: var(--text-dim); margin-bottom: 24px; }
     .auth-toggle { color: var(--accent); cursor: pointer; font-weight: 600; }
     .auth-toggle:hover { text-decoration: underline; }
+    .auth-footer-text { font-size: 13px; color: var(--text-dim); }
 
     /* ── Diff Feed ────────────────────────────────── */
     .diff-item {
@@ -154,6 +157,9 @@
     .diff-stats { font-family: 'SF Mono', 'Consolas', monospace; font-size: 12px; }
     .diff-stats .added { color: var(--green); }
     .diff-stats .removed { color: var(--red); }
+    .diff-content { flex: 1; }
+    .diff-title { font-weight: 600; }
+    .diff-summary { font-size: 13px; margin-top: 2px; }
 
     /* ── Animations ───────────────────────────────── */
     @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -165,12 +171,19 @@
     .hidden { display: none !important; }
     .mt-2 { margin-top: 8px; }
     .mt-4 { margin-top: 16px; }
+    .mb-4 { margin-bottom: 16px; }
+    .w-full { width: 100%; }
     .gap-2 { gap: 8px; }
     .flex { display: flex; }
     .items-center { align-items: center; }
     .justify-between { justify-content: space-between; }
     .text-right { text-align: right; }
+    .font-bold { font-weight: 600; }
+    .plan-title { font-size: 24px; font-weight: 800; }
     .mono { font-family: 'SF Mono', 'Consolas', monospace; font-size: 13px; }
+    .cell-mono-ellipsis { font-family: 'SF Mono', 'Consolas', monospace; font-size: 12px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cell-mono-target { font-family: 'SF Mono', 'Consolas', monospace; font-size: 12px; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .text-muted { font-size: 12px; color: var(--text-dim); }
     .empty-state { text-align: center; padding: 40px; color: var(--text-dim); }
     .error-msg { color: var(--red); font-size: 13px; margin-top: 8px; }
     .success-msg { color: var(--green); font-size: 13px; margin-top: 8px; }
@@ -187,7 +200,7 @@
     <div class="logo">⚡ Changelog<span>Radar</span></div>
     <div class="nav-actions">
       <span class="nav-user" id="nav-user"></span>
-      <button class="btn btn-secondary btn-sm" id="nav-logout" onclick="logout()" style="display:none">Log Out</button>
+      <button class="btn btn-secondary btn-sm hidden" id="nav-logout" onclick="logout()">Log Out</button>
     </div>
   </nav>
 
@@ -207,8 +220,8 @@
         <label for="auth-password">Password</label>
         <input id="auth-password" type="password" placeholder="Min 8 characters" autocomplete="current-password" />
         <div id="auth-error" class="error-msg hidden"></div>
-        <button class="btn btn-primary mt-4" style="width:100%" onclick="handleAuth()" id="auth-submit">Sign In</button>
-        <p class="mt-4" style="font-size:13px;color:var(--text-dim)">
+        <button class="btn btn-primary mt-4 w-full" onclick="handleAuth()" id="auth-submit">Sign In</button>
+        <p class="mt-4 auth-footer-text">
           <span id="auth-switch-text">Don't have an account?</span>
           <span class="auth-toggle" onclick="toggleAuthMode()" id="auth-switch-link">Create one</span>
         </p>
@@ -268,7 +281,7 @@
           </div>
 
           <!-- Create Source Form -->
-          <div id="create-source-form" class="card hidden" style="margin-bottom:16px;">
+          <div id="create-source-form" class="card mb-4 hidden">
             <h3>Add New Source</h3>
             <div class="grid-2">
               <div>
@@ -311,7 +324,7 @@
             <button class="btn btn-primary btn-sm" onclick="showCreateAlert()">+ Add Alert</button>
           </div>
 
-          <div id="create-alert-form" class="card hidden" style="margin-bottom:16px;">
+          <div id="create-alert-form" class="card mb-4 hidden">
             <h3>New Alert</h3>
             <div class="grid-2">
               <div>
@@ -430,7 +443,7 @@
       localStorage.removeItem('acr_token');
       document.getElementById('auth-view').classList.remove('hidden');
       document.getElementById('dashboard-view').classList.add('hidden');
-      document.getElementById('nav-logout').style.display = 'none';
+      document.getElementById('nav-logout').classList.add('hidden');
       document.getElementById('nav-user').textContent = '';
     }
 
@@ -444,7 +457,7 @@
       document.getElementById('auth-view').classList.add('hidden');
       document.getElementById('dashboard-view').classList.remove('hidden');
       document.getElementById('nav-user').textContent = user.display_name || user.email;
-      document.getElementById('nav-logout').style.display = '';
+      document.getElementById('nav-logout').classList.remove('hidden');
 
       loadOverview();
     }
@@ -487,9 +500,9 @@
       container.innerHTML = res.data.diffs.map(d => `
         <div class="diff-item fade-in">
           <div class="diff-severity ${d.severity}"></div>
-          <div style="flex:1">
-            <div style="font-weight:600;">${esc(d.source_name || 'Source #' + d.source_id)}</div>
-            <div style="font-size:13px;margin-top:2px;">${esc(d.summary_text || 'Change detected')}</div>
+          <div class="diff-content">
+            <div class="diff-title">${esc(d.source_name || 'Source #' + d.source_id)}</div>
+            <div class="diff-summary">${esc(d.summary_text || 'Change detected')}</div>
             <div class="diff-meta">
               <span class="diff-stats"><span class="added">+${d.added_lines}</span> <span class="removed">-${d.removed_lines}</span></span>
               &nbsp;·&nbsp; ${timeAgo(d.detected_at)}
@@ -533,11 +546,11 @@
         <thead><tr><th>Name</th><th>URL</th><th>Type</th><th>Status</th><th>Last Polled</th><th>Actions</th></tr></thead>
         <tbody>${res.data.sources.map(s => `
           <tr>
-            <td style="font-weight:600;">${esc(s.name)}</td>
-            <td class="mono" style="font-size:12px;max-width:220px;overflow:hidden;text-overflow:ellipsis;">${esc(s.url)}</td>
+            <td class="font-bold">${esc(s.name)}</td>
+            <td class="cell-mono-ellipsis">${esc(s.url)}</td>
             <td><span class="badge badge-dim">${s.kind}</span></td>
             <td><span class="badge badge-${s.status === 'active' ? 'green' : s.status === 'error' ? 'red' : 'yellow'}">${s.status}</span></td>
-            <td style="font-size:12px;color:var(--text-dim);">${s.last_polled_at ? timeAgo(s.last_polled_at) : 'never'}</td>
+            <td class="text-muted">${s.last_polled_at ? timeAgo(s.last_polled_at) : 'never'}</td>
             <td>
               <button class="btn btn-secondary btn-sm" onclick="pollSource(${s.id})">Poll Now</button>
               <button class="btn btn-danger btn-sm" onclick="deleteSource(${s.id})">Delete</button>
@@ -590,8 +603,8 @@
         <tbody>${res.data.alerts.map(a => `
           <tr>
             <td><span class="badge badge-dim">${a.channel}</span></td>
-            <td class="mono" style="font-size:12px;max-width:250px;overflow:hidden;text-overflow:ellipsis;">${esc(a.target)}</td>
-            <td>${a.source_name ? esc(a.source_name) : '<span style="color:var(--text-dim)">All sources</span>'}</td>
+            <td class="cell-mono-target">${esc(a.target)}</td>
+            <td>${a.source_name ? esc(a.source_name) : '<span class="text-muted">All sources</span>'}</td>
             <td><span class="badge badge-${a.enabled ? 'green' : 'yellow'}">${a.enabled ? 'active' : 'paused'}</span></td>
             <td>
               <button class="btn btn-secondary btn-sm" onclick="testAlertAction(${a.id})">Test</button>
@@ -634,10 +647,10 @@
         <thead><tr><th>Name</th><th>Prefix</th><th>Scopes</th><th>Last Used</th><th>Status</th><th>Actions</th></tr></thead>
         <tbody>${res.data.api_keys.map(k => `
           <tr>
-            <td style="font-weight:600;">${esc(k.name)}</td>
+            <td class="font-bold">${esc(k.name)}</td>
             <td class="mono">${esc(k.prefix)}••••••••</td>
             <td><span class="badge badge-dim">${k.scopes}</span></td>
-            <td style="font-size:12px;color:var(--text-dim);">${k.last_used_at ? timeAgo(k.last_used_at) : 'never'}</td>
+            <td class="text-muted">${k.last_used_at ? timeAgo(k.last_used_at) : 'never'}</td>
             <td><span class="badge badge-${k.revoked_at ? 'red' : 'green'}">${k.revoked_at ? 'revoked' : 'active'}</span></td>
             <td>${!k.revoked_at ? `<button class="btn btn-danger btn-sm" onclick="revokeKey(${k.id})">Revoke</button>` : ''}</td>
           </tr>`).join('')}
@@ -661,7 +674,7 @@
         <p><strong>Member since:</strong> ${u.created_at ? new Date(u.created_at).toLocaleDateString() : '—'}</p>
       `;
       document.getElementById('settings-plan').innerHTML = `
-        <p style="font-size:24px;font-weight:800;">${plan?.name || 'Free'}</p>
+        <p class="plan-title">${plan?.name || 'Free'}</p>
         <p class="mt-2"><strong>Sources:</strong> ${usage.sources} / ${usage.max_sources}</p>
         <p><strong>Retention:</strong> ${plan?.retention_days || 7} days</p>
         <p><strong>Rate limit:</strong> ${plan?.rate_limit_rpm || 30} req/min</p>
