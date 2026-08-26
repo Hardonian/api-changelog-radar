@@ -45,9 +45,15 @@ export class Router {
    * Convert '/api/v1/sources/:id/diffs' → regex with named groups.
    */
   _patternToRegex(pattern) {
-    const escaped = pattern
-      .replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // escape regex special chars
-      .replace(/\\:(\w+)/g, '([^/]+)');        // replace :param with capture group
-    return new RegExp(`^${escaped}$`);
+    // Replace :param placeholders BEFORE escaping special chars
+    const PLACEHOLDER = '___PARAM___';
+    const paramNames = [];
+    const withPlaceholders = pattern.replace(/:(\w+)/g, (_, name) => {
+      paramNames.push(name);
+      return PLACEHOLDER;
+    });
+    const escaped = withPlaceholders.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const final = escaped.replaceAll(PLACEHOLDER, '([^/]+)');
+    return new RegExp(`^${final}$`);
   }
 }

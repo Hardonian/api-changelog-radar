@@ -1,22 +1,46 @@
-# Hardonian standard justfile — works for any stack.
+# API Changelog Radar — justfile
 # Install just: pipx install rust-just
 
 # Detect and install deps + create .env
 bootstrap:
     ./scripts/bootstrap.sh
 
-# Run the app (override per repo)
+# Run worker locally with wrangler dev
 dev:
-    @echo "Override 'dev' in your repo justfile"
+    cd deploy/workers && npx wrangler dev
 
 # Run tests
 test:
-    @echo "Override 'test' in your repo justfile"
+    cd deploy/workers && npm test
 
-# Smoke / health check
+# Lint source code
+lint:
+    cd deploy/workers && npx eslint src/ tests/ || true
+
+# Deploy to production
+deploy:
+    cd deploy/workers && npm run deploy
+
+# Apply D1 migrations locally
+db-migrate-local:
+    cd deploy/workers && npm run db:migrate:local
+
+# Apply D1 migrations to production
+db-migrate:
+    cd deploy/workers && npm run db:migrate
+
+# Smoke / health check (production)
 smoke:
-    @echo "Override 'smoke' in your repo justfile"
+    @curl -fsS https://api-changelog-radar.scottrmhardie.workers.dev/health | python3 -m json.tool
+
+# Smoke / health check (local)
+smoke-local:
+    @curl -fsS http://localhost:8787/health | python3 -m json.tool
+
+# Show worker logs
+tail:
+    cd deploy/workers && npx wrangler tail
 
 # Show status
 status:
-    @curl -fsS http://127.0.0.1:8000/health || echo "no health endpoint on :8000"
+    @curl -fsS https://api-changelog-radar.scottrmhardie.workers.dev/health || echo "Worker not responding"
