@@ -1,5 +1,9 @@
 # API Changelog Radar
 
+<!-- BEGIN: REPO HERO -->
+![api-changelog-radar — hero generated locally on the GPU stack](assets/repo-hero.png)
+<!-- END: REPO HERO -->
+
 **Monitor vendor API changelogs, diff changes automatically, and alert your team before integrations break.**
 
 [![Deploy](https://github.com/Hardonian/api-changelog-radar/actions/workflows/deploy.yml/badge.svg)](https://github.com/Hardonian/api-changelog-radar/actions/workflows/deploy.yml)
